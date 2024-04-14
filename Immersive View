@@ -1,0 +1,43 @@
+import SwiftUI
+import RealityKit
+import RealityKitContent
+struct ImmersiveView: View {
+    var body: some View {
+        RealityView { content in
+            guard let skyBoxEntity = createSkyBox() else {
+                print("Error loading skybox entity")
+                return
+            }
+            
+            let solarEntity = await createSolarModel()
+
+            content.add(skyBoxEntity)
+            content.add(solarEntity)
+            
+        }
+    }
+   
+    private func createSkyBox () -> Entity? {
+        let largeSphere = MeshResource.generateSphere(radius: 1000)
+        var skyBoxMaterial = UnlitMaterial()
+        do {
+            let texture = try TextureResource.load(named: "Issac")
+            skyBoxMaterial.color = .init(texture: .init(texture))
+        } catch {
+            print("Error loading texture: \(error)")
+        }
+        let skyBoxEntity = Entity()
+        skyBoxEntity.components.set(
+            ModelComponent(mesh: largeSphere, materials: [skyBoxMaterial])
+        )
+        skyBoxEntity.scale *= .init(x:-1, y:1, z:1)
+        
+        return skyBoxEntity
+    }
+    private func createSolarModel ()async -> Entity {
+        guard let solarEntity = try? await Entity(named: "Immersive", in: realityKitContentBundle) else {
+            fatalError("Cannot load Solar model ")
+        }
+        return solarEntity
+    }
+}
