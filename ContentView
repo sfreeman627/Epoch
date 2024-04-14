@@ -1,0 +1,46 @@
+import SwiftUI
+import RealityKit
+import RealityKitContent
+
+struct ImmersiveControlView: View {
+    @Environment(\.openImmersiveSpace) var openImmersiveSpace
+    @State private var immersiveSpaceOpened = false
+    var body: some View {
+        if !immersiveSpaceOpened {
+            NavigationView {
+                List {
+                    NavigationLink(destination: ImmersiveView().onAppear {
+                        Task {
+                            await openImmersiveSpace(id: "ImmersiveView")
+                            immersiveSpaceOpened = true
+                        }
+                    }) {
+                        Label("Moon Landing", systemImage: "moonphase.new.moon")
+                    }
+
+                    NavigationLink(destination: AirHart().onAppear {
+                        Task {
+                            await openImmersiveSpace(id: "AirHart")
+                            immersiveSpaceOpened = true
+                        }
+                    }) {
+                        Label("Amelia Earhart", systemImage: "airplane.departure")
+                    }
+                    
+                    Label("Issac Newton", systemImage: "apple.logo")
+                    Label("Industrial Factory", systemImage: "gear")
+                    Label("Constitution", systemImage: "newspaper.circle")
+                    Label("Magna Carta", systemImage: "signature")
+                }
+                .listStyle(SidebarListStyle())
+                .navigationTitle("Historical Time Scenes")
+                .toolbar {
+                }
+                
+                Text("Select a time period to explore")
+                    .font(.title)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+}
